@@ -2,10 +2,16 @@ export interface TracePoint {
   k: number;
   hour: number;
   moisture: number;
+  vm_p1?: number;
+  vm_p2?: number;
+  vm_p3?: number;
   p1: boolean;
   p2: boolean;
   p3: boolean;
   p3_reason: string | null;
+  cum_p1?: number;
+  cum_p2?: number;
+  cum_p3?: number;
 }
 
 export interface MetricSummary {
@@ -100,4 +106,31 @@ export interface ParetoPoint {
   ic_hi_rmse: string;
   perdidos: string;
   admissivel: string;
+}
+
+export interface EventItem {
+  id: number;
+  segmento: string;
+  policy: string;
+  D: number;
+  perdido: boolean;
+  t_ev_s: number;
+}
+
+export interface PairedTonItem {
+  segmento: string;
+  P1_ton: number;
+  P2_ton: number;
+  P3_ton: number;
+  P1_tx_ton?: number;
+  P2_tx_ton?: number;
+  P3_tx_ton?: number;
+}
+
+export interface VarreduraItem {
+  gap: number;
+  label: string;
+  mediana: number;
+  q1: number;
+  q3: number;
 }
