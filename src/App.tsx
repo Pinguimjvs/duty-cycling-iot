@@ -130,6 +130,7 @@ export const App: React.FC = () => {
             <div>
               <div className="text-slate-300 font-medium">Grupo 21:</div>
               <div className="text-slate-400">Héctor Yolvi Herrera Cruz &amp; João Vitor Salvini</div>
+              <div className="text-slate-500 text-[11px] mt-0.5">Orientador: Prof. Dr. Júlio Cezar Estrella</div>
             </div>
             <div className="h-8 w-px bg-slate-800 hidden md:block" />
             <a

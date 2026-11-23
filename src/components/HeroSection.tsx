@@ -40,7 +40,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExplore }) => {
           <div className="mt-4 flex items-center space-x-4 text-xs sm:text-sm text-slate-400">
             <div>Autores: <span className="text-slate-200 font-medium">Héctor Yolvi Herrera Cruz</span> & <span className="text-slate-200 font-medium">João Vitor Salvini</span></div>
             <span>•</span>
-            <div>Orientador: <span className="text-slate-200 font-medium">Prof. ICMC-USP</span></div>
+            <div>Orientador: <span className="text-slate-200 font-medium">Prof. Dr. Júlio Cezar Estrella</span></div>
           </div>
         </div>
 
