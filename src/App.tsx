@@ -13,7 +13,7 @@ export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('overview');
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-teal-500 selection:text-white">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-teal-500 selection:text-white">
       {/* Navigation Bar */}
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
