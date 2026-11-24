@@ -33,19 +33,17 @@ import {
   Layers,
   Network,
   Radio,
+  RefreshCw,
   Sliders,
   TrendingDown,
   Wifi,
   Zap,
 } from 'lucide-react';
-import summaryDataRaw from '../data/summary_results.json';
-import analyticsDataRaw from '../data/cp4_detailed_analytics.json';
+import { useLiveData } from '../context/LiveDataContext';
 import { SummaryData } from '../types';
 
-const summaryData = summaryDataRaw as unknown as SummaryData;
-const analytics = analyticsDataRaw as any;
-
 export const ResultsDashboard: React.FC = () => {
+  const { summary: summaryData, analytics, isLive, lastSync, refresh, isSyncing } = useLiveData();
   const [activeMetricTab, setActiveMetricTab] = useState<'ton' | 'latency' | 'diagnostics' | 'rmse' | 'pareto'>('ton');
   
   // Sub-toggles
@@ -94,7 +92,7 @@ export const ResultsDashboard: React.FC = () => {
   return (
     <section className="py-10 px-4 sm:px-6 lg:px-8 max-w-[1480px] mx-auto">
       {/* Title */}
-      <div className="text-center max-w-3xl mx-auto mb-10">
+      <div className="text-center max-w-3xl mx-auto mb-6">
         <span className="text-xs font-bold uppercase tracking-wider text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-200">
           Resultados da Campanha Experimental
         </span>
@@ -104,6 +102,38 @@ export const ResultsDashboard: React.FC = () => {
         <p className="text-slate-600 mt-2 text-sm sm:text-base">
           Evidências empíricas consolidadas a partir dos 21 blocos válidos de replay físico no ESP32, incluindo os 10 eventos de saturação por chuva e varredura de gaps.
         </p>
+      </div>
+
+      {/* Live Data Sync Banner */}
+      <div className={`max-w-2xl mx-auto mb-8 p-3 rounded-xl border flex items-center justify-between gap-3 text-xs shadow-sm ${
+        isLive 
+          ? 'bg-emerald-50/90 border-emerald-200 text-emerald-900' 
+          : 'bg-amber-50/90 border-amber-200 text-amber-900'
+      }`}>
+        <div className="flex items-center space-x-2">
+          <span className={`w-2.5 h-2.5 rounded-full ${isLive ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+          <span className="font-bold">
+            {isLive ? 'Dados em Tempo Real da VM (andromeda.lasdpc.icmc.usp.br:5375)' : 'Modo Snapshot Local (Offline)'}
+          </span>
+          <span className="text-slate-400 hidden sm:inline">•</span>
+          <span className="text-slate-600 hidden sm:inline">
+            {isLive ? 'Consumindo /api/summary e /api/analytics' : 'Exibindo dados consolidados'}
+          </span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <span className="text-[11px] text-slate-500 font-mono hidden md:inline">
+            {lastSync ? lastSync.toLocaleTimeString() : ''}
+          </span>
+          <button
+            onClick={() => refresh()}
+            disabled={isSyncing}
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 text-[11px] font-semibold transition-all shadow-2xs"
+            title="Atualizar dados da VM"
+          >
+            <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
+            <span>{isSyncing ? 'Sincronizando...' : 'Recarregar'}</span>
+          </button>
+        </div>
       </div>
 
       {/* Primary Tabs */}

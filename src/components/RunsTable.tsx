@@ -1,11 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { RunRow } from '../types';
-import runsDataRaw from '../data/runs_table.json';
-import { CheckCircle2, ChevronLeft, ChevronRight, Database, Download, Filter, HelpCircle, Search, ShieldAlert, XCircle } from 'lucide-react';
-
-const runsData = runsDataRaw as RunRow[];
+import { useLiveData } from '../context/LiveDataContext';
+import { CheckCircle2, ChevronLeft, ChevronRight, Database, Download, Filter, HelpCircle, RefreshCw, Search, ShieldAlert, Wifi, XCircle } from 'lucide-react';
 
 export const RunsTable: React.FC = () => {
+  const { runs: runsData, isLive, isSyncing, refresh, lastSync } = useLiveData();
   const [searchTerm, setSearchTerm] = useState('');
   const [policyFilter, setPolicyFilter] = useState<'ALL' | 'P1' | 'P2' | 'P3'>('ALL');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'sim' | 'nao' | 'pendente'>('ALL');
@@ -66,13 +65,47 @@ export const RunsTable: React.FC = () => {
           </p>
         </div>
 
-        <button
-          onClick={handleDownloadCsv}
-          className="mt-4 md:mt-0 flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 shadow-sm transition-colors"
-        >
-          <Download className="w-3.5 h-3.5 text-slate-500" />
-          <span>Exportar runs.csv</span>
-        </button>
+        <div className="flex items-center space-x-2 mt-4 md:mt-0">
+          <button
+            onClick={() => refresh()}
+            disabled={isSyncing}
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 shadow-sm transition-colors"
+            title="Atualizar dados da VM"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${isSyncing ? 'animate-spin' : ''}`} />
+            <span>{isSyncing ? 'Sincronizando...' : 'Recarregar'}</span>
+          </button>
+          <button
+            onClick={handleDownloadCsv}
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 shadow-sm transition-colors"
+          >
+            <Download className="w-3.5 h-3.5 text-slate-500" />
+            <span>Exportar runs.csv</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Live Sync Banner */}
+      <div className={`mb-6 p-3.5 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs ${
+        isLive 
+          ? 'bg-emerald-50/90 border-emerald-200 text-emerald-900' 
+          : 'bg-amber-50/90 border-amber-200 text-amber-900'
+      }`}>
+        <div className="flex items-center space-x-2.5">
+          <span className={`w-2.5 h-2.5 rounded-full ${isLive ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+          <span className="font-bold">
+            {isLive ? 'Conectado à VM ao Vivo (andromeda.lasdpc.icmc.usp.br:5375)' : 'Modo Snapshot Local (Offline)'}
+          </span>
+          <span className="text-slate-500 hidden md:inline">•</span>
+          <span className="text-slate-600 hidden md:inline">
+            {isLive 
+              ? `Consumindo ~/t21/data/runs.csv via endpoint /api/runs (${runsData.length} registros)` 
+              : `Exibindo snapshot estático pré-compilado (${runsData.length} registros)`}
+          </span>
+        </div>
+        <div className="text-[11px] text-slate-500 font-mono">
+          {lastSync ? `Última sincronização: ${lastSync.toLocaleTimeString()}` : 'Aguardando sincronização'}
+        </div>
       </div>
 
       {/* Filter and Search Bar */}

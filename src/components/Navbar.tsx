@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLiveData } from '../context/LiveDataContext';
 import {
   Activity,
   BarChart3,
@@ -11,7 +12,11 @@ import {
   Layers,
   Menu,
   Presentation,
+  Radio,
+  RefreshCw,
+  Server,
   ShieldCheck,
+  Wifi,
   X,
 } from 'lucide-react';
 
@@ -21,7 +26,9 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
+  const { isLive, isSyncing, lastSync, autoRefresh, setAutoRefresh, refresh, vmInfo } = useLiveData();
   const [showDownloads, setShowDownloads] = useState(false);
+  const [showVmModal, setShowVmModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
@@ -95,6 +102,101 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
               <GitBranch className="w-3.5 h-3.5 text-teal-400" />
               <span>08003d2</span>
             </a>
+
+            {/* VM Connection Status Pill & Modal */}
+            <div className="relative">
+              <button
+                onClick={() => setShowVmModal(!showVmModal)}
+                className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-all whitespace-nowrap shadow-sm ${
+                  isLive
+                    ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/25'
+                    : 'bg-amber-500/15 border-amber-500/40 text-amber-300 hover:bg-amber-500/25'
+                }`}
+                title="Status da conexão com a VM (andromeda.lasdpc.icmc.usp.br:5375)"
+              >
+                <span className={`w-2 h-2 rounded-full ${isLive ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+                <span className="font-mono text-[11px]">{isLive ? 'VM :5375' : 'Local'}</span>
+                <ChevronDown className={`w-3 h-3 opacity-70 transition-transform ${showVmModal ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* VM Status Modal / Popover */}
+              {showVmModal && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowVmModal(false)} />
+                  <div className="absolute right-0 mt-2 w-80 bg-slate-900/98 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/80 p-4 z-50 text-xs">
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                      <div className="flex items-center space-x-2">
+                        <Server className="w-4 h-4 text-teal-400" />
+                        <span className="font-bold text-white text-sm">Serviços da VM</span>
+                      </div>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
+                        isLive ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                      }`}>
+                        {isLive ? 'ONLINE' : 'SNAPSHOT LOCAL'}
+                      </span>
+                    </div>
+
+                    <div className="mt-3 space-y-2 text-slate-300">
+                      <div className="text-[11px] text-slate-400">
+                        Host: <span className="font-mono text-slate-200">andromeda.lasdpc.icmc.usp.br</span>
+                      </div>
+
+                      {/* Ports Map */}
+                      <div className="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700/60 space-y-1.5 font-mono text-[11px]">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400">Porta 5175:</span>
+                          <span className="text-teal-300">Broker Mosquitto MQTT</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400">Porta 5275:</span>
+                          <span className="text-cyan-300">Orquestrador (t21lab)</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400">Porta 5375:</span>
+                          <span className="text-emerald-300 font-bold">Frontend Web &amp; API REST</span>
+                        </div>
+                        <div className="flex items-center justify-between pt-1 border-t border-slate-700 text-slate-400">
+                          <span>Porta SSH:</span>
+                          <span>23175 (giotgrad21)</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-1 text-[11px] text-slate-400">
+                        <span>Último sync:</span>
+                        <span className="font-mono text-slate-200">
+                          {lastSync ? lastSync.toLocaleTimeString() : 'Ainda não sincronizado'}
+                        </span>
+                      </div>
+
+                      {/* Auto-refresh Toggle */}
+                      <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-[11px]">
+                        <span className="text-slate-300">Auto-refresh (10s):</span>
+                        <button
+                          onClick={() => setAutoRefresh(!autoRefresh)}
+                          className={`px-2.5 py-0.5 rounded-full font-semibold transition-colors ${
+                            autoRefresh ? 'bg-teal-500 text-slate-950' : 'bg-slate-800 text-slate-400 border border-slate-700'
+                          }`}
+                        >
+                          {autoRefresh ? 'Ativo' : 'Pausado'}
+                        </button>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="pt-3 flex gap-2">
+                        <button
+                          onClick={() => refresh()}
+                          disabled={isSyncing}
+                          className="flex-1 flex items-center justify-center space-x-1.5 py-2 px-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold transition-all shadow-sm"
+                        >
+                          <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                          <span>{isSyncing ? 'Sincronizando...' : 'Sincronizar Agora'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
 
             {/* Downloads Dropdown */}
             <div className="relative">

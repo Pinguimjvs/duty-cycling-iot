@@ -13,7 +13,7 @@ import {
   Area,
 } from 'recharts';
 import { TracePoint } from '../types';
-import traceDataRaw from '../data/s01_trace.json';
+import { useLiveData } from '../context/LiveDataContext';
 import {
   Activity,
   AlertCircle,
@@ -24,13 +24,13 @@ import {
   Filter,
   Info,
   Radio,
+  RefreshCw,
   Sliders,
   Zap,
 } from 'lucide-react';
 
-const traceData = traceDataRaw as TracePoint[];
-
 export const TraceViewer: React.FC = () => {
+  const { traceData, isLive, lastSync, refresh, isSyncing } = useLiveData();
   const [viewMode, setViewMode] = useState<'integrated' | 'panels'>('panels');
   const [showP1, setShowP1] = useState(false);
   const [showP2, setShowP2] = useState(true);

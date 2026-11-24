@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { LiveDataProvider } from './context/LiveDataContext';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
 import { PoliciesComparison } from './components/PoliciesComparison';
@@ -9,7 +10,7 @@ import { RunsTable } from './components/RunsTable';
 import { PaperSection } from './components/PaperSection';
 import { Activity, BookOpen, ExternalLink, Github, Heart, Layers, ShieldCheck, Terminal, Zap } from 'lucide-react';
 
-export const App: React.FC = () => {
+export const AppContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('overview');
 
   return (
@@ -146,13 +147,21 @@ export const App: React.FC = () => {
         </div>
 
         <div className="max-w-[1480px] mx-auto mt-8 pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-slate-500 gap-2">
-          <div>Checkpoint 04 Final · Pronto para deploy na Vercel</div>
+          <div>Checkpoint 04 Final · Servido na VM em <span className="font-mono text-slate-400">andromeda.lasdpc.icmc.usp.br:5375</span></div>
           <div className="flex items-center space-x-1">
             <span>Desenvolvido com React, TypeScript, Tailwind CSS e Recharts</span>
           </div>
         </div>
       </footer>
     </div>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <LiveDataProvider>
+      <AppContent />
+    </LiveDataProvider>
   );
 };
 
